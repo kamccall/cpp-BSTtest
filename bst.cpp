@@ -43,7 +43,7 @@ void bst::Add(Node* newNodePtr, Node*& headPtr)
    {
       Add(newNodePtr, headPtr->right);
    }
-   // duplicate entries will fall out
+   // assumes no duplicate entries
 }
 
 void bst::Print() const
@@ -60,21 +60,22 @@ void bst::Print(Node* nodePtr) const
    if (nodePtr->right != nullptr) Print(nodePtr->right);
 }
 
-Node* bst::Find(int number)
-{
-   return Find(head, number);
-}
+// Node* bst::Find(int number)
+// {
+//    return Find(head, number);
+// }
 
-Node* bst::Find(Node*& nodePtr, int number)
-{
-   if(nodePtr == nullptr) return nullptr;
-   else if (number < nodePtr->data) return Find(nodePtr->left, number);
-   else if (number > nodePtr->data) return Find(nodePtr->right, number);
-   else return nodePtr;
-}
+// Node* bst::Find(Node*& nodePtr, int number)
+// {
+//    if(nodePtr == nullptr) return nullptr;
+//    else if (number < nodePtr->data) return Find(nodePtr->left, number);
+//    else if (number > nodePtr->data) return Find(nodePtr->right, number);
+//    else return nodePtr;
+// }
 
 Node* bst::FindMax(Node* nodePtr)
 {
+   // passed the left sub-tree below a target, gets max and returns pointer
    if(nodePtr == nullptr) return nullptr;
    while (nodePtr->right != nullptr)
    {
@@ -90,6 +91,7 @@ void bst::Remove(int number)
 
 Node* bst::Remove(Node* nodePtr, int number)
 {
+   // called from node above one to delete
    if(nodePtr == nullptr) return nullptr;
    else if(number < nodePtr->data)
    {
@@ -101,24 +103,27 @@ Node* bst::Remove(Node* nodePtr, int number)
    }
    else
    {
-      // leaf node: no children
+      // no children
       if(nodePtr->left == nullptr && nodePtr->right == nullptr)
       {
          delete nodePtr;
          nodePtr = nullptr;
       }
+      // only 1 (right) child
       else if(nodePtr->left == nullptr)
       {
          Node* tempPtr = nodePtr;
          nodePtr = nodePtr->right;
          delete tempPtr;
       }
+      // only 1 (left) child
       else if(nodePtr->right == nullptr)
       {
          Node* tempPtr = nodePtr;
          nodePtr = nodePtr->left;
          delete tempPtr;
       }
+      // has 2 children, so swap data w/ in-order predecessor
       else
       {
          Node* tempPtr = FindMax(nodePtr->left);
@@ -128,111 +133,3 @@ Node* bst::Remove(Node* nodePtr, int number)
    }
    return nodePtr;
 }
-
-// LINKED LIST STUFF ----------------------------------------------------------
-llNode::llNode(): next(nullptr) {}
-
-llNode::llNode(int number): data(number), next(nullptr) {}
-
-ll::ll(): head(nullptr) {}
-
-ll::~ll()
-{
-   llNode* nodePtr = head;
-
-   if(nodePtr != nullptr)
-   {
-      do
-      {
-         llNode* nextNode = nodePtr->next;
-         delete(nodePtr);
-         nodePtr = nextNode;
-      } while (nodePtr != nullptr);
-   }
-}
-
-void ll::Add(int number)
-{
-   llNode* newNode = new llNode(number);
-   Add(newNode, head);
-}
-
-void ll::Add(llNode* newNodePtr, llNode* headPtr)
-{
-   if (headPtr == nullptr)
-   {
-      head = newNodePtr;
-   }
-   else if(newNodePtr->data < headPtr->data)
-   {
-      newNodePtr->next = headPtr;
-      head = newNodePtr;
-   }
-   else
-   {
-      llNode* nextNodePtr = headPtr->next;
-
-      while(nextNodePtr != nullptr && newNodePtr->data > nextNodePtr->data)
-      {
-         headPtr = headPtr->next;
-         nextNodePtr = headPtr->next;
-      }
-
-      headPtr->next = newNodePtr;
-
-      if(nextNodePtr != nullptr)
-      {
-         newNodePtr->next = nextNodePtr;
-      }
-   }
-}
-
-void ll::Print() const
-{
-   Print(head);
-}
-
-void ll::Print(llNode* nodePtr) const
-{
-   if(nodePtr == nullptr) return;
-   else
-   {
-      while(nodePtr != nullptr)
-      {
-         cout << nodePtr->data << endl;
-         nodePtr = nodePtr->next;
-      }
-   }
-}
-
-void ll::Remove(int number)
-{
-   llNode* nodePtr = head;
-
-   if (nodePtr == nullptr) return;
-   else if(nodePtr->data == number)
-   {
-      head = nodePtr->next;
-      delete(nodePtr);
-   }
-   else
-   {
-      llNode* nextNodePtr = nodePtr->next;
-   
-      while(nextNodePtr !=nullptr && number > nextNodePtr->data)
-      {
-         nodePtr = nodePtr->next;
-         nextNodePtr = nodePtr->next;
-      }
-
-      if(nextNodePtr != nullptr)
-      {
-         if (nextNodePtr->data == number)
-         {
-            nodePtr->next = nextNodePtr->next;
-            delete(nextNodePtr);
-         }
-      }
-   }
-}
-
